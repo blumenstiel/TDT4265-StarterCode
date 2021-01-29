@@ -15,8 +15,12 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: BinaryModel) -
     Returns:
         Accuracy (float)
     """
-    # TODO Implement this function (Task 2c)
-    accuracy = 0.0
+    # perform predictions
+    Yhat = model.forward(X)
+
+    # calculate accurancy by dividing the correct predictions with the total number of predictions
+    accuracy = (Yhat.round() == targets).sum() / targets.shape[0]
+
     return accuracy
 
 
@@ -34,8 +38,18 @@ class LogisticTrainer(BaseTrainer):
         Returns:
             loss value (float) on batch
         """
-        # TODO: Implement this function (task 2b)
-        loss = 0
+        # Perform forward pass to get outputs (predictions)
+        Yhat_batch = self.model.forward(X_batch)
+
+        # Perform backward pass to get gradiant
+        self.model.backward(X_batch, Yhat_batch, Y_batch)
+
+        # Update weights in gradiant step
+        self.model.w = self.model.w - self.learning_rate * self.model.grad
+
+        # Calculate cross entropy loss
+        loss = cross_entropy_loss(Y_batch, Yhat_batch)
+
         return loss
 
     def validation_step(self):
@@ -105,14 +119,14 @@ if __name__ == "__main__":
     plt.savefig("task2b_binary_train_loss.png")
     plt.show()
 
-    # Plot accuracy
+    # Plot accuracy (task 2c)
     plt.ylim([0.93, .99])
     utils.plot_loss(train_history["accuracy"], "Training Accuracy")
     utils.plot_loss(val_history["accuracy"], "Validation Accuracy")
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Accuracy")
     plt.legend()
-    plt.savefig("task2b_binary_train_accuracy.png")
+    plt.savefig("task2c_binary_train_accuracy.png")
     plt.show()
 
     # Task 2e - Create a comparison between training with and without shuffling

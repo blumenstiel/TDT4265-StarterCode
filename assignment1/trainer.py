@@ -88,7 +88,10 @@ class BaseTrainer:
                     val_history["loss"][global_step] = val_loss
                     val_history["accuracy"][global_step] = accuracy_val
 
-                    # TODO (Task 2d): Implement early stopping here.
-                    # You can access the validation loss in val_history["loss"]
+                    # early stopping: stop training when loss didn't improved in last 10 steps
+                    if global_step > 10 and np.argmin(list(val_history["loss"].values())[-11:]) == 0:
+                        print(f'Early stopping after {epoch} epochs')
+                        return train_history, val_history
+
                 global_step += 1
         return train_history, val_history

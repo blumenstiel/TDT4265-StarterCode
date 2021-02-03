@@ -139,13 +139,9 @@ if __name__ == "__main__":
     # You can finish the rest of task 4 below this point.
 
     # Plotting of softmax weights (Task 4b)
-    weight_model = np.reshape(model.w[:-1,0],(28,28))
-    for i in range(1,10):
-        weight_model = np.concatenate((weight_model, np.reshape(model.w[:-1,i],(28,28))), axis = 1)
+    weight_model = np.concatenate([np.reshape(model.w[:-1,i],(28,28)) for i in range(10)], axis=1)
 
-    weight_model1 = np.reshape(model1.w[:-1,0],(28,28))
-    for i in range(1,10):
-        weight_model1 = np.concatenate((weight_model1, np.reshape(model1.w[:-1,i],(28,28))), axis = 1)
+    weight_model1 = np.concatenate([np.reshape(model1.w[:-1,i],(28,28)) for i in range(10)], axis=1)
 
     plt.imsave("task4b_softmax_weight.png", np.concatenate((weight_model,weight_model1)), cmap="gray")
 
@@ -153,7 +149,7 @@ if __name__ == "__main__":
     l2_lambdas = [1, .1, .01, .001]
     model_lambda = [SoftmaxModel(i) for i in l2_lambdas]
     k=0
-    weight_4d = []
+    weight_4e = []
     for model in model_lambda:
         # Train model
         trainer = SoftmaxTrainer(
@@ -163,16 +159,17 @@ if __name__ == "__main__":
         val_history = trainer.train(num_epochs)[1]
         utils.plot_loss(val_history["accuracy"], "Validation Accuracy, " + "lambda=" + str(l2_lambdas[k]))
         k+=1
-        weight_4d.append(np.linalg.norm(model.w))
+        weight_4e.append(np.linalg.norm(model.w))
+    plt.ylim([0.7, .95])
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Accuracy")
     plt.legend()
     plt.savefig("task4c_l2_reg_accuracy.png")
     plt.show()
 
-    # Task 4d - Plotting of the l2 norm for each weight
-    plt.plot(l2_lambdas,weight_4d)
+    # Task 4e - Plotting of the l2 norm for each weight
+    plt.scatter(l2_lambdas, weight_4e)
     plt.xlabel("Lambda")
-    plt.ylabel("L2 norm")
-    plt.savefig("task4d_l2_reg_norms.png")
+    plt.ylabel("L2 norm of weights")
+    plt.savefig("task4e_l2_reg_norms.png")
     plt.show()

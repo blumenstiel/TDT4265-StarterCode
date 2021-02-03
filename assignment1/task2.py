@@ -19,7 +19,7 @@ def calculate_accuracy(X: np.ndarray, targets: np.ndarray, model: BinaryModel) -
     Yhat = model.forward(X)
 
     # calculate accurancy by dividing the correct predictions with the total number of predictions
-    accuracy = (Yhat.round() == targets).sum() / targets.shape[0]
+    accuracy = (Yhat.round() == targets).mean()
 
     return accuracy
 

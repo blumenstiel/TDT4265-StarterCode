@@ -69,7 +69,7 @@ class SoftmaxModel:
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
 
         # Function 8
-        self.grad = - X.T.dot(targets - outputs) / X.shape[0]
+        self.grad = - X.T.dot(targets - outputs) / X.shape[0] + 2 * self.l2_reg_lambda * self.w
 
         assert self.grad.shape == self.w.shape,\
              f"Grad shape: {self.grad.shape}, w: {self.w.shape}"

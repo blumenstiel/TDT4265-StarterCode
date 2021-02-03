@@ -153,6 +153,7 @@ if __name__ == "__main__":
     l2_lambdas = [1, .1, .01, .001]
     model_lambda = [SoftmaxModel(i) for i in l2_lambdas]
     k=0
+    weight_4d = []
     for model in model_lambda:
         # Train model
         trainer = SoftmaxTrainer(
@@ -162,6 +163,7 @@ if __name__ == "__main__":
         val_history = trainer.train(num_epochs)[1]
         utils.plot_loss(val_history["accuracy"], "Validation Accuracy, " + "lambda=" + str(l2_lambdas[k]))
         k+=1
+        weight_4d.append(np.linalg.norm(model.w))
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Accuracy")
     plt.legend()
@@ -169,5 +171,8 @@ if __name__ == "__main__":
     plt.show()
 
     # Task 4d - Plotting of the l2 norm for each weight
-
+    plt.plot(l2_lambdas,weight_4d)
+    plt.xlabel("Lambda")
+    plt.ylabel("L2 norm")
     plt.savefig("task4d_l2_reg_norms.png")
+    plt.show()

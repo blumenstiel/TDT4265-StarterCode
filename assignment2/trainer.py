@@ -87,6 +87,11 @@ class BaseTrainer:
                     train_history["accuracy"][global_step] = accuracy_train
                     val_history["loss"][global_step] = val_loss
                     val_history["accuracy"][global_step] = accuracy_val
-                    # TODO: Implement early stopping (copy from last assignment)
+                    
+                    # early stopping: stop training when loss didn't improved in last 60 steps
+                    if global_step > 60 and np.argmin(list(val_history["loss"].values())[-61:]) == 0:
+                        print(f'Early stopping after {epoch} epochs')
+                        return train_history, val_history
+
                 global_step += 1
         return train_history, val_history

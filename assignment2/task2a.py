@@ -15,7 +15,7 @@ def pre_process_images(X: np.ndarray):
         f"X.shape[1]: {X.shape[1]}, should be 784"
 
     # normalization trick
-    X = (X - np.mean(X_train))/np.std(X_train)
+    X = (X - np.mean(X))/np.std(X)
 
     # bias trick: add 1 at the end of each image
     X = np.append(X, np.ones((X.shape[0], 1)), axis=1)
@@ -41,7 +41,7 @@ def softmax(z):
     """
     The softmax function
     """
-    return np.exp(z) / np.exp(z).sum(axis=1)[:, None]
+    return np.exp(z) / np.exp(z).sum(axis=1, keepdims=True)
 
 
 def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
@@ -52,11 +52,12 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     Returns:
         Cross entropy error (float)
     """
+
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
 
-    # cross entropy loss function
-    C = - (targets * np.log(outputs) + (1 - targets) * np.log(1 - outputs))
+    # Function 7
+    C = - (targets * np.log(outputs)).sum(axis=1)
 
     return C.mean()
 
@@ -129,8 +130,8 @@ class SoftmaxModel:
                 f"Expected the same shape. Grad shape: {grad.shape}, w: {w.shape}."
 
         g = np.dot(self.ws[1], -(targets - outputs).T).T * sigmoid_prime(np.dot(X, self.ws[0]))
-        self.grads.append(np.dot(X.T, g))
-        self.grads.append(np.dot(-(targets - outputs).T, self.hidden_layer_output))
+        self.grads.append(np.dot(X.T, g) / outputs.shape[0])
+        self.grads.append(np.dot(-(targets - outputs).T, self.hidden_layer_output).T / outputs.shape[0])
 
 
     def zero_grad(self) -> None:

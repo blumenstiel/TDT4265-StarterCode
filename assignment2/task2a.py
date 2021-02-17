@@ -37,6 +37,20 @@ def sigmoid_prime(z):
     return sigmoid(z)*(1-sigmoid(z))
 
 
+def improved_sigmoid(z):
+    """
+    The improved sigmoid function, zero-centered function
+    """
+    return 1.7159 * np.tanh(2*z/3)
+
+
+def improved_sigmoid_prime(z):
+    """
+    Derivative of the improved sigmoid
+    """
+    return 1.7159 * 2 / (3 * np.cosh(2*z/3)**2)
+
+
 def softmax(z):
     """
     The softmax function
@@ -89,7 +103,10 @@ class SoftmaxModel:
         for size in self.neurons_per_layer:
             w_shape = (prev, size)
             print("Initializing weight to shape:", w_shape)
-            w = np.random.uniform(-1, 1, w_shape)
+            if use_improved_weight_init:
+                w = np.random.normal(0, 1 / np.sqrt(prev), w_shape)
+            else:
+                w = np.random.uniform(-1, 1, w_shape)
             self.ws.append(w)
             prev = size
         self.grads = [None for i in range(len(self.ws))]
@@ -104,7 +121,11 @@ class SoftmaxModel:
 
         # HINT: For peforming the backward pass, you can save intermediate activations in varialbes in the forward pass.
         # such as self.hidden_layer_ouput = ...
-        self.hidden_layer_output = sigmoid(X.dot(self.ws[0]))
+        if self.use_improved_sigmoid:
+            self.hidden_layer_output = improved_sigmoid(X.dot(self.ws[0]))
+        else:
+            self.hidden_layer_output = sigmoid(X.dot(self.ws[0]))
+
         return softmax(self.hidden_layer_output.dot(self.ws[1]))
 
     def backward(self, X: np.ndarray, outputs: np.ndarray,
@@ -128,7 +149,11 @@ class SoftmaxModel:
             assert grad.shape == w.shape,\
                 f"Expected the same shape. Grad shape: {grad.shape}, w: {w.shape}."
 
-        g = np.dot(self.ws[1], -(targets - outputs).T).T * sigmoid_prime(np.dot(X, self.ws[0]))
+        if self.use_improved_sigmoid:
+            g = np.dot(self.ws[1], -(targets - outputs).T).T * improved_sigmoid_prime(np.dot(X, self.ws[0]))
+        else:
+            g = np.dot(self.ws[1], -(targets - outputs).T).T * sigmoid_prime(np.dot(X, self.ws[0]))
+            
         self.grads.append(np.dot(X.T, g) / outputs.shape[0])
         self.grads.append(np.dot(-(targets - outputs).T, self.hidden_layer_output).T / outputs.shape[0])
 

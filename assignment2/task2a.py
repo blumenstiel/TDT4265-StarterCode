@@ -56,7 +56,6 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
     assert targets.shape == outputs.shape,\
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
 
-    # Function 7
     C = - (targets * np.log(outputs)).sum(axis=1)
 
     return C.mean()
@@ -132,7 +131,6 @@ class SoftmaxModel:
         g = np.dot(self.ws[1], -(targets - outputs).T).T * sigmoid_prime(np.dot(X, self.ws[0]))
         self.grads.append(np.dot(X.T, g) / outputs.shape[0])
         self.grads.append(np.dot(-(targets - outputs).T, self.hidden_layer_output).T / outputs.shape[0])
-
 
     def zero_grad(self) -> None:
         self.grads = [None for i in range(len(self.ws))]

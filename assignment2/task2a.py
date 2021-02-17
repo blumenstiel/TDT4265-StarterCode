@@ -80,8 +80,8 @@ class SoftmaxModel:
     def __init__(self,
                  # Number of neurons per layer
                  neurons_per_layer: typing.List[int],
-                 use_improved_sigmoid: bool,  # Task 3a hyperparameter
-                 use_improved_weight_init: bool  # Task 3c hyperparameter
+                 use_improved_sigmoid: bool,  # Task 3b hyperparameter
+                 use_improved_weight_init: bool  # Task 3a hyperparameter
                  ):
         # Always reset random seed before weight init to get comparable results.
         np.random.seed(1)
@@ -138,24 +138,22 @@ class SoftmaxModel:
             outputs: outputs of model of shape: [batch size, num_outputs]
             targets: labels/targets of each image of shape: [batch size, num_classes]
         """
-        # TODO implement this function (Task 2b)
         assert targets.shape == outputs.shape,\
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
         # A list of gradients.
         # For example, self.grads[0] will be the gradient for the first hidden layer
-        self.grads = []
-
-        for grad, w in zip(self.grads, self.ws):
-            assert grad.shape == w.shape,\
-                f"Expected the same shape. Grad shape: {grad.shape}, w: {w.shape}."
 
         if self.use_improved_sigmoid:
             g = np.dot(self.ws[1], -(targets - outputs).T).T * improved_sigmoid_prime(np.dot(X, self.ws[0]))
         else:
             g = np.dot(self.ws[1], -(targets - outputs).T).T * sigmoid_prime(np.dot(X, self.ws[0]))
-            
-        self.grads.append(np.dot(X.T, g) / outputs.shape[0])
-        self.grads.append(np.dot(-(targets - outputs).T, self.hidden_layer_output).T / outputs.shape[0])
+
+        self.grads[0] = np.dot(X.T, g) / outputs.shape[0]
+        self.grads[1] = np.dot(-(targets - outputs).T, self.hidden_layer_output).T / outputs.shape[0]
+
+        for grad, w in zip(self.grads, self.ws):
+            assert grad.shape == w.shape,\
+                f"Expected the same shape. Grad shape: {grad.shape}, w: {w.shape}."
 
     def zero_grad(self) -> None:
         self.grads = [None for i in range(len(self.ws))]

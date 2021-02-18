@@ -55,15 +55,18 @@ class SoftmaxTrainer(BaseTrainer):
         # Perform backward pass to get gradiant
         self.model.backward(X_batch, Yhat_batch, Y_batch)
 
-        # Update weights in gradiant step
-        if self.use_momentum:
-            self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.previous_grads[1]
-            self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.previous_grads[0]
 
+        if self.use_momentum:
+            # update delta w (Formula 6)
             self.previous_grads[1] = self.model.grads[1] + self.momentum_gamma * self.previous_grads[1]
             self.previous_grads[0] = self.model.grads[0] + self.momentum_gamma * self.previous_grads[0]
 
+            # Update weights in gradiant step with momentum
+            self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.previous_grads[1]
+            self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.previous_grads[0]
+
         else:
+            # Update weights in gradiant step
             self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
             self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
 

@@ -167,12 +167,56 @@ if __name__ == "__main__":
             # plt.show()
             plt.savefig("task3c_with_momentum.png")
 
-    if compare_improved_sigmoid and compare_momentum:
+    if compare_improved_weight_init and compare_momentum:
+        # Task 3 all
+        # Comparing baseline model to combined improvements
+        print("Comparing baseline model to Improved Weight Init and Momentum")
+        use_improved_weight_init = True
+        use_momentum = True
+
+        model_improved_weight_momentum = SoftmaxModel(
+            neurons_per_layer,
+            use_improved_sigmoid,
+            use_improved_weight_init)
+        trainer_improved_weight_momentum = SoftmaxTrainer(
+            momentum_gamma, use_momentum,
+            model_improved_weight_momentum, learning_rate, batch_size, shuffle_data,
+            X_train, Y_train, X_val, Y_val,
+        )
+        train_history_improved_weight_momentum, val_history_improved_weight_momentum = trainer_improved_weight_momentum.train(
+            num_epochs)
+        use_improved_weight_init = False
+        use_momentum = False
+
+        if single_plots:
+            plt.figure(figsize=(20, 12))
+            plt.subplot(1, 2, 1)
+            plt.ylim([0, .5])
+            utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)
+            utils.plot_loss(train_history_improved_weight_momentum["loss"],
+                            "Task 3 Model - Improved Weight Init and Momentum", npoints_to_average=10)
+            utils.plot_loss(val_history_improved_weight_momentum["loss"], "Task 3 Model - Validation Loss",
+                            npoints_to_average=10)
+            plt.xlabel("Number of Training Steps")
+            plt.ylabel("Cross Entropy Loss - Average")
+
+            plt.subplot(1, 2, 2)
+            plt.ylim([0.85, .99])
+            utils.plot_loss(val_history["accuracy"], "Task 2 Model")
+            utils.plot_loss(val_history_improved_weight_momentum["accuracy"],
+                            "Task 3 Model - Improved Weight Init and Momentum")
+            plt.xlabel("Number of Training Steps")
+            plt.ylabel("Validation Accuracy")
+            plt.legend()
+            # plt.show()
+            plt.savefig("task3_all_improvements.png")
+
+    if compare_improved_weight_init and compare_improved_sigmoid and compare_momentum:
         # Task 3 all
         # Comparing baseline model to combined improvements
         print("Comparing baseline model to all improvements")
         use_improved_weight_init = True
-        use_improved_sigmoid = False  # TODO: Not working
+        use_improved_sigmoid = True  # TODO: Not working together with momentum
         use_momentum = True
 
         model_improved_all = SoftmaxModel(
@@ -207,7 +251,7 @@ if __name__ == "__main__":
             plt.ylabel("Validation Accuracy")
             plt.legend()
             # plt.show()
-            plt.savefig("task3_all_improvements.png")
+            plt.savefig("task3_improved_weight_momentum.png")
 
     plt.figure(figsize=(20, 12))
     plt.subplot(1, 2, 1)
@@ -221,7 +265,10 @@ if __name__ == "__main__":
                         npoints_to_average=10)
     if compare_momentum:
         utils.plot_loss(train_history_momentum["loss"], "Task 3c Model - With Momentum", npoints_to_average=10)
-    if compare_improved_sigmoid and compare_momentum:
+    if compare_improved_weight_init and compare_momentum:
+        utils.plot_loss(train_history_improved_weight_momentum["loss"],
+                        "Task 3 Model - Improved Weight Init and Momentum", npoints_to_average=10)
+    if compare_improved_weight_init and compare_improved_sigmoid and compare_momentum:
         utils.plot_loss(train_history_improved_all["loss"], "Task 3 Model - With all Improvements",
                         npoints_to_average=10)
     plt.xlabel("Number of Training Steps")
@@ -236,7 +283,10 @@ if __name__ == "__main__":
         utils.plot_loss(val_history_improved_sigmoid["accuracy"], "Task 3b Model - Improved Weight Init and Sigmoid")
     if compare_momentum:
         utils.plot_loss(val_history_momentum["accuracy"], "Task 3c Model - With Momentum")
-    if compare_improved_sigmoid and compare_momentum:
+    if compare_improved_weight_init and compare_momentum:
+        utils.plot_loss(val_history_improved_weight_momentum["accuracy"],
+                        "Task 3 Model - Improved Weight Init and Momentum")
+    if compare_improved_weight_init and compare_improved_sigmoid and compare_momentum:
         utils.plot_loss(val_history_improved_all["accuracy"], "Task 3 Model - With all Improvements")
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Validation Accuracy")

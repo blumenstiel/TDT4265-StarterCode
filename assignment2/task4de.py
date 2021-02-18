@@ -49,14 +49,18 @@ if __name__ == "__main__":
         train_history[model_name] = current_train_history
         val_history[model_name] = current_val_history
 
-    plt.figure(figsize=(20, 12))
+    plt.figure(figsize=(16, 10))
     plt.subplot(1, 2, 1)
     plt.ylim([0, .5])
     for model_name in train_history.keys():
         utils.plot_loss(train_history[model_name]["loss"], model_name,
                         npoints_to_average=10)
+    for model_name in train_history.keys():
+        utils.plot_loss(val_history[model_name]["loss"], f'Validation {model_name[10:]}',
+                        npoints_to_average=10)
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Cross Entropy Loss - Average")
+    plt.legend()
 
     plt.subplot(1, 2, 2)
     plt.ylim([0.9, .99])

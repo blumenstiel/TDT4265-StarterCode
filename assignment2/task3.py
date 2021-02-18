@@ -60,7 +60,7 @@ if __name__ == "__main__":
         use_improved_weight_init = False
 
         if single_plots:
-            plt.figure(figsize=(20, 12))
+            plt.figure(figsize=(16, 10))
             plt.subplot(1, 2, 1)
             plt.ylim([0, .5])
             utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         use_improved_sigmoid = False
 
         if single_plots:
-            plt.figure(figsize=(20, 12))
+            plt.figure(figsize=(16, 10))
             plt.subplot(1, 2, 1)
             plt.ylim([0, .5])
             utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)
@@ -147,7 +147,7 @@ if __name__ == "__main__":
         use_momentum = False
 
         if single_plots:
-            plt.figure(figsize=(20, 12))
+            plt.figure(figsize=(16, 10))
             plt.subplot(1, 2, 1)
             plt.ylim([0, .5])
             utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)
@@ -189,7 +189,7 @@ if __name__ == "__main__":
         use_momentum = False
 
         if single_plots:
-            plt.figure(figsize=(20, 12))
+            plt.figure(figsize=(16, 10))
             plt.subplot(1, 2, 1)
             plt.ylim([0, .5])
             utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)
@@ -232,7 +232,7 @@ if __name__ == "__main__":
             num_epochs)
 
         if single_plots:
-            plt.figure(figsize=(20, 12))
+            plt.figure(figsize=(16, 10))
             plt.subplot(1, 2, 1)
             plt.ylim([0, .5])
             utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)
@@ -253,7 +253,7 @@ if __name__ == "__main__":
             # plt.show()
             plt.savefig("task3_improved_weight_momentum.png")
 
-    plt.figure(figsize=(20, 12))
+    plt.figure(figsize=(16, 10))
     plt.subplot(1, 2, 1)
     plt.ylim([0, .5])
     utils.plot_loss(train_history["loss"], "Task 2 Model", npoints_to_average=10)

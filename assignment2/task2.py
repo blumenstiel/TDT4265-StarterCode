@@ -139,7 +139,7 @@ if __name__ == "__main__":
     print("Validation accuracy:", calculate_accuracy(X_val, Y_val, model))
 
     # Plot loss for first model (task 2c)
-    plt.figure(figsize=(20, 12))
+    plt.figure(figsize=(16, 10))
     plt.subplot(1, 2, 1)
     plt.ylim([0., .5])
     utils.plot_loss(train_history["loss"],

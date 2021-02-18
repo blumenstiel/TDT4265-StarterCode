@@ -44,14 +44,17 @@ if __name__ == "__main__":
         train_history[num_hidden_neurons] = current_train_history
         val_history[num_hidden_neurons] = current_val_history
 
-    plt.figure(figsize=(20, 12))
+    plt.figure(figsize=(16, 10))
     plt.subplot(1, 2, 1)
     plt.ylim([0, .5])
     for num_hidden_neurons in list_hidden_neurons:
         utils.plot_loss(train_history[num_hidden_neurons]["loss"], f"Model with {num_hidden_neurons} hidden neurons",
                         npoints_to_average=10)
+    for num_hidden_neurons in list_hidden_neurons:
+        utils.plot_loss(val_history[num_hidden_neurons]["loss"], f"Validation with {num_hidden_neurons} hidden neurons")
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Cross Entropy Loss - Average")
+    plt.legend()
 
     plt.subplot(1, 2, 2)
     plt.ylim([0.9, .99])

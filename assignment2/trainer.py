@@ -91,7 +91,8 @@ class BaseTrainer:
                     # early stopping: stop training when loss didn't improved in last 60 steps
                     if global_step > 60 and np.argmin(list(val_history["loss"].values())[-61:]) == 0:
                         print(f'Early stopping after {epoch} epochs')
+                        print(f'Final Accuracy: {val_history["accuracy"][global_step]}')
+                        print(f'Final Training Loss: {train_history["loss"][global_step]}')
                         return train_history, val_history
-
                 global_step += 1
         return train_history, val_history

@@ -169,8 +169,6 @@ class SoftmaxModel:
 
             # compute error for the previous layer
             error = np.dot(error, self.ws[-layer_idx].T) * _sigmoid_prime(self.hidden_layer_activation[-layer_idx])
-            # TODO: Following https://stackoverflow.com/questions/54624562/back-propagation-and-forward-propagation-for-2-hidden-layers-in-neural-network/56425972
-            #  the weight update must be computed before computing the error for hidden layers
 
         # update gradient of first layer
         self.grads[0] = np.dot(X.T, error) / outputs.shape[0]

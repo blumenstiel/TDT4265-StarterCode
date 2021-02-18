@@ -1,6 +1,7 @@
 import numpy as np
 import utils
 import typing
+
 np.random.seed(1)
 
 
@@ -11,11 +12,11 @@ def pre_process_images(X: np.ndarray):
     Returns:
         X: images of shape [batch size, 785] normalized as described in task2a
     """
-    assert X.shape[1] == 784,\
+    assert X.shape[1] == 784, \
         f"X.shape[1]: {X.shape[1]}, should be 784"
 
     # normalization trick
-    X = (X - np.mean(X))/np.std(X)
+    X = (X - np.mean(X)) / np.std(X)
 
     # bias trick: add 1 at the end of each image
     X = np.append(X, np.ones((X.shape[0], 1)), axis=1)
@@ -34,21 +35,21 @@ def sigmoid_prime(z):
     """
     Derivative of the sigmoid function
     """
-    return sigmoid(z)*(1-sigmoid(z))
+    return sigmoid(z) * (1 - sigmoid(z))
 
 
 def improved_sigmoid(z):
     """
     The improved sigmoid function, zero-centered function
     """
-    return 1.7159 * np.tanh(2*z/3)
+    return 1.7159 * np.tanh(2 * z / 3)
 
 
 def improved_sigmoid_prime(z):
     """
     Derivative of the improved sigmoid
     """
-    return 1.7159 * 2 / (3 * np.cosh(2*z/3)**2)
+    return 1.7159 * 2 / (3 * np.cosh(2 * z / 3) ** 2)
 
 
 def softmax(z):
@@ -67,7 +68,7 @@ def cross_entropy_loss(targets: np.ndarray, outputs: np.ndarray):
         Cross entropy error (float)
     """
 
-    assert targets.shape == outputs.shape,\
+    assert targets.shape == outputs.shape, \
         f"Targets shape: {targets.shape}, outputs: {outputs.shape}"
 
     C = - (targets * np.log(outputs)).sum(axis=1)
@@ -90,7 +91,9 @@ class SoftmaxModel:
         self.use_improved_sigmoid = use_improved_sigmoid
 
         # Define hidden_layer_output
-        self.hidden_layer_output = None
+        self.hidden_layer_output = [np.zeros(n) for n in neurons_per_layer[:-1]]
+        # Add hidden_layer before activation
+        self.hidden_layer_activation = [np.zeros(n) for n in neurons_per_layer[:-1]]
 
         # Define number of output nodes
         # neurons_per_layer = [64, 10] indicates that we will have two layers:
@@ -119,14 +122,23 @@ class SoftmaxModel:
             y: output of model with shape [batch size, num_outputs]
         """
 
-        # HINT: For peforming the backward pass, you can save intermediate activations in varialbes in the forward pass.
-        # such as self.hidden_layer_ouput = ...
-        if self.use_improved_sigmoid:
-            self.hidden_layer_output = improved_sigmoid(X.dot(self.ws[0]))
-        else:
-            self.hidden_layer_output = sigmoid(X.dot(self.ws[0]))
+        def _sigmoid(z):
+            """Internal function for switching between standard sigmoid and the erivative of the improved sigmoid"""
+            if self.use_improved_sigmoid:
+                return improved_sigmoid(z)
+            return sigmoid(z)
 
-        return softmax(self.hidden_layer_output.dot(self.ws[1]))
+        # Forward pass using improved_sigmoid
+        # first hidden layer
+        self.hidden_layer_activation[0] = X.dot(self.ws[0])
+        self.hidden_layer_output[0] = _sigmoid(self.hidden_layer_activation[0])
+
+        # Task 4c - variable number of hidden layer
+        for layer_idx in range(1, len(self.hidden_layer_output)):
+            self.hidden_layer_activation[layer_idx] = self.hidden_layer_output[layer_idx - 1].dot(self.ws[layer_idx])
+            self.hidden_layer_output[layer_idx] = _sigmoid(self.hidden_layer_activation[layer_idx])
+
+        return softmax(self.hidden_layer_output[-1].dot(self.ws[-1]))
 
     def backward(self, X: np.ndarray, outputs: np.ndarray,
                  targets: np.ndarray) -> None:
@@ -138,18 +150,30 @@ class SoftmaxModel:
             outputs: outputs of model of shape: [batch size, num_outputs]
             targets: labels/targets of each image of shape: [batch size, num_classes]
         """
-        assert targets.shape == outputs.shape,\
+        assert targets.shape == outputs.shape, \
             f"Output shape: {outputs.shape}, targets: {targets.shape}"
-        # A list of gradients.
-        # For example, self.grads[0] will be the gradient for the first hidden layer
 
-        if self.use_improved_sigmoid:
-            g = np.dot(self.ws[1], -(targets - outputs).T).T * improved_sigmoid_prime(np.dot(X, self.ws[0]))
-        else:
-            g = np.dot(self.ws[1], -(targets - outputs).T).T * sigmoid_prime(np.dot(X, self.ws[0]))
+        def _sigmoid_prime(z):
+            """Internal function for switching between standard sigmoid and the erivative of the improved sigmoid"""
+            if self.use_improved_sigmoid:
+                return improved_sigmoid_prime(z)
+            return sigmoid_prime(z)
 
-        self.grads[0] = np.dot(X.T, g) / outputs.shape[0]
-        self.grads[1] = np.dot(-(targets - outputs).T, self.hidden_layer_output).T / outputs.shape[0]
+        # compute error for the last layer
+        error = outputs - targets
+
+        # reverse iteration over layers
+        for layer_idx in range(1, len(self.ws)):
+            # update gradient with error
+            self.grads[-layer_idx] = np.dot(self.hidden_layer_output[-layer_idx].T, error) / outputs.shape[0]
+
+            # compute error for the previous layer
+            error = np.dot(error, self.ws[-layer_idx].T) * _sigmoid_prime(self.hidden_layer_activation[-layer_idx])
+            # TODO: Following https://stackoverflow.com/questions/54624562/back-propagation-and-forward-propagation-for-2-hidden-layers-in-neural-network/56425972
+            #  the weight update must be computed before computing the error for hidden layers
+
+        # update gradient of first layer
+        self.grads[0] = np.dot(X.T, error) / outputs.shape[0]
 
         for grad, w in zip(self.grads, self.ws):
             assert grad.shape == w.shape,\
@@ -193,8 +217,8 @@ def gradient_approximation_test(
                 logits = model.forward(X)
                 model.backward(X, logits, Y)
                 difference = gradient_approximation - \
-                    model.grads[layer_idx][i, j]
-                assert abs(difference) <= epsilon**2,\
+                             model.grads[layer_idx][i, j]
+                assert abs(difference) <= epsilon ** 2, \
                     f"Calculated gradient is incorrect. " \
                     f"Layer IDX = {layer_idx}, i={i}, j={j}.\n" \
                     f"Approximation: {gradient_approximation}, actual gradient: {model.grads[layer_idx][i, j]}\n" \
@@ -213,7 +237,7 @@ if __name__ == "__main__":
     X_train, Y_train, *_ = utils.load_full_mnist()
     X_train = pre_process_images(X_train)
     Y_train = one_hot_encode(Y_train, 10)
-    assert X_train.shape[1] == 785,\
+    assert X_train.shape[1] == 785, \
         f"Expected X_train to have 785 elements per image. Shape was: {X_train.shape}"
 
     neurons_per_layer = [64, 10]

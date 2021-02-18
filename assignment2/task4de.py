@@ -8,14 +8,19 @@ if __name__ == "__main__":
     # initialize dicts for results
     train_history = dict()
     val_history = dict()
-    list_hidden_neurons = [32, 64, 128]
+    list_neurons_per_layer = [[64, 10],
+                              [60, 60, 10],
+                              [64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 10],
+                              ]
+    model_names = ['Baseline - One hidden layer with 64 neurons',
+                   'Model Task 4d - Two hidden layers with 60 neurons',
+                   'Model Task 4e - Ten hidden layers with 64 neurons']
 
     # evaluate models for each number of hidden neurons
-    for num_hidden_neurons in list_hidden_neurons:
+    for neurons_per_layer, model_name in zip(list_neurons_per_layer, model_names):
         num_epochs = 50
         learning_rate = .1
         batch_size = 32
-        neurons_per_layer = [num_hidden_neurons, 10]
         momentum_gamma = .9
         shuffle_data = True
 
@@ -41,25 +46,25 @@ if __name__ == "__main__":
             X_train, Y_train, X_val, Y_val,
         )
         current_train_history, current_val_history = trainer.train(num_epochs)
-        train_history[num_hidden_neurons] = current_train_history
-        val_history[num_hidden_neurons] = current_val_history
+        train_history[model_name] = current_train_history
+        val_history[model_name] = current_val_history
 
     plt.figure(figsize=(20, 12))
     plt.subplot(1, 2, 1)
     plt.ylim([0, .5])
-    for num_hidden_neurons in list_hidden_neurons:
-        utils.plot_loss(train_history[num_hidden_neurons]["loss"], f"Model with {num_hidden_neurons} hidden neurons",
+    for model_name in train_history.keys():
+        utils.plot_loss(train_history[model_name]["loss"], model_name,
                         npoints_to_average=10)
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Cross Entropy Loss - Average")
 
     plt.subplot(1, 2, 2)
     plt.ylim([0.9, .99])
-    for num_hidden_neurons in list_hidden_neurons:
-        utils.plot_loss(val_history[num_hidden_neurons]["accuracy"], f"Model with {num_hidden_neurons} hidden neurons")
+    for model_name in val_history.keys():
+        utils.plot_loss(val_history[model_name]["accuracy"], model_name)
 
     plt.xlabel("Number of Training Steps")
     plt.ylabel("Validation Accuracy")
     plt.legend()
     # plt.show()
-    plt.savefig("task4ab_num_hidden_neurons.png")
+    plt.savefig("task4de_hidden_layers.png")

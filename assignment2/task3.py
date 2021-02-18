@@ -73,7 +73,7 @@ if __name__ == "__main__":
             plt.legend()
 
             plt.subplot(1, 2, 2)
-            plt.ylim([0.85, .99])
+            plt.ylim([0.9, .99])
             utils.plot_loss(val_history["accuracy"], "Task 2 Model")
             utils.plot_loss(val_history_improved_weight["accuracy"], "Task 3a Model - Improved Weight Initialization")
             plt.xlabel("Number of Training Steps")
@@ -117,7 +117,7 @@ if __name__ == "__main__":
             plt.legend()
 
             plt.subplot(1, 2, 2)
-            plt.ylim([0.85, .99])
+            plt.ylim([0.9, .99])
             utils.plot_loss(val_history["accuracy"], "Task 2 Model")
             utils.plot_loss(val_history_improved_sigmoid["accuracy"],
                             "Task 3b Model - Improved Weight Init and Sigmoid")
@@ -158,7 +158,7 @@ if __name__ == "__main__":
             plt.legend()
 
             plt.subplot(1, 2, 2)
-            plt.ylim([0.85, .99])
+            plt.ylim([0.9, .99])
             utils.plot_loss(val_history["accuracy"], "Task 2 Model")
             utils.plot_loss(val_history_momentum["accuracy"], "Task 3c Model - With Momentum")
             plt.xlabel("Number of Training Steps")
@@ -201,7 +201,7 @@ if __name__ == "__main__":
             plt.ylabel("Cross Entropy Loss - Average")
 
             plt.subplot(1, 2, 2)
-            plt.ylim([0.85, .99])
+            plt.ylim([0.9, .99])
             utils.plot_loss(val_history["accuracy"], "Task 2 Model")
             utils.plot_loss(val_history_improved_weight_momentum["accuracy"],
                             "Task 3 Model - Improved Weight Init and Momentum")
@@ -244,7 +244,7 @@ if __name__ == "__main__":
             plt.ylabel("Cross Entropy Loss - Average")
 
             plt.subplot(1, 2, 2)
-            plt.ylim([0.85, .99])
+            plt.ylim([0.9, .99])
             utils.plot_loss(val_history["accuracy"], "Task 2 Model")
             utils.plot_loss(val_history_improved_all["accuracy"], "Task 3 Model - With all Improvements")
             plt.xlabel("Number of Training Steps")
@@ -275,7 +275,7 @@ if __name__ == "__main__":
     plt.ylabel("Cross Entropy Loss - Average")
 
     plt.subplot(1, 2, 2)
-    plt.ylim([0.85, .99])
+    plt.ylim([0.9, .99])
     utils.plot_loss(val_history["accuracy"], "Task 2 Model")
     if compare_improved_weight_init:
         utils.plot_loss(val_history_improved_weight["accuracy"], "Task 3a Model - Improved Weight Initialization")

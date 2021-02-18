@@ -58,17 +58,17 @@ class SoftmaxTrainer(BaseTrainer):
 
         if self.use_momentum:
             # update delta w (Formula 6)
-            self.previous_grads[1] = self.model.grads[1] + self.momentum_gamma * self.previous_grads[1]
-            self.previous_grads[0] = self.model.grads[0] + self.momentum_gamma * self.previous_grads[0]
+            for layer_idx, grads in enumerate(self.model.grads):
+                self.previous_grads[layer_idx] = grads + self.momentum_gamma * self.previous_grads[layer_idx]
 
             # Update weights in gradiant step with momentum
-            self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.previous_grads[1]
-            self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.previous_grads[0]
+            for layer_idx, previous_grads in enumerate(self.previous_grads):
+                self.model.ws[layer_idx] = self.model.ws[layer_idx] - self.learning_rate * previous_grads
 
         else:
             # Update weights in gradiant step
-            self.model.ws[1] = self.model.ws[1] - self.learning_rate * self.model.grads[1]
-            self.model.ws[0] = self.model.ws[0] - self.learning_rate * self.model.grads[0]
+            for layer_idx, grads in enumerate(self.model.grads):
+                self.model.ws[layer_idx] = self.model.ws[layer_idx] - self.learning_rate * grads
 
         # Calculate cross entropy loss
         loss = cross_entropy_loss(Y_batch, Yhat_batch)

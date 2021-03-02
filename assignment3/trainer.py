@@ -5,6 +5,7 @@ import time
 import collections
 import utils
 import pathlib
+import progressbar
 
 
 def compute_loss_and_accuracy(
@@ -23,8 +24,7 @@ def compute_loss_and_accuracy(
     """
     average_loss = []
     accuracy = []
-    total = 0
-    # TODO: Implement this function (Task  2a)
+
     with torch.no_grad():
         for (X_batch, Y_batch) in dataloader:
             # Transfer images/labels to GPU VRAM, if possible
@@ -35,10 +35,9 @@ def compute_loss_and_accuracy(
 
             # Compute Loss and Accuracy
             average_loss.append(loss_criterion(output_probs, Y_batch))
-            accuracy.append((output_probs.argmax(dim=-1) == Y_batch).sum())
-            total += Y_batch.shape[0]
+            accuracy.append((output_probs.argmax(dim=-1) == Y_batch).float().mean())
 
-        return sum(average_loss) / len(average_loss), sum(accuracy) / total
+        return sum(average_loss) / len(average_loss), sum(accuracy) / len(accuracy)
 
 
 class Trainer:
@@ -64,7 +63,7 @@ class Trainer:
         self.model = model
         # Transfer model to GPU VRAM, if possible.
         self.model = utils.to_cuda(self.model)
-        print(self.model)
+        # print(self.model)
 
         # Define our optimizer. SGD = Stochastich Gradient Descent
         self.optimizer = torch.optim.SGD(self.model.parameters(),
@@ -165,6 +164,12 @@ class Trainer:
         def should_validate_model():
             return self.global_step % self.num_steps_per_val == 0
 
+        # Progressbar to estimate training time
+        widgets = [progressbar.Timer(format='Time: %(elapsed)s'),
+                   progressbar.Bar('='),
+                   ' (', progressbar.ETA(), ')\n']
+        bar = progressbar.ProgressBar(maxval=self.epochs, widgets=widgets).start()
+
         for epoch in range(self.epochs):
             self.epoch = epoch
             # Perform a full pass through all the training samples
@@ -179,6 +184,7 @@ class Trainer:
                     if self.should_early_stop():
                         print("Early stopping.")
                         return
+            bar.update(self.epoch+1)
 
     def save_model(self):
         def is_best_model():

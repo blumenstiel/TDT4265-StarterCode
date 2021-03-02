@@ -35,11 +35,10 @@ def compute_loss_and_accuracy(
 
             # Compute Loss and Accuracy
             average_loss.append(loss_criterion(output_probs, Y_batch))
-            print(output_probs.shape, Y_batch.shape)
-            accuracy.append((output_probs == Y_batch).sum())
+            accuracy.append((output_probs.argmax(dim=-1) == Y_batch).sum())
             total += Y_batch.shape[0]
 
-    return average_loss.mean(), accuracy.sum()/total
+        return sum(average_loss) / len(average_loss), sum(accuracy) / total
 
 
 class Trainer:

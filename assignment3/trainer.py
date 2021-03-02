@@ -21,8 +21,9 @@ def compute_loss_and_accuracy(
     Returns:
         [average_loss, accuracy]: both scalar.
     """
-    average_loss = 0
-    accuracy = 0
+    average_loss = []
+    accuracy = []
+    total = 0
     # TODO: Implement this function (Task  2a)
     with torch.no_grad():
         for (X_batch, Y_batch) in dataloader:
@@ -33,8 +34,12 @@ def compute_loss_and_accuracy(
             output_probs = model(X_batch)
 
             # Compute Loss and Accuracy
+            average_loss.append(loss_criterion(output_probs, Y_batch))
+            print(output_probs.shape, Y_batch.shape)
+            accuracy.append((output_probs == Y_batch).sum())
+            total += Y_batch.shape[0]
 
-    return average_loss, accuracy
+    return average_loss.mean(), accuracy.sum()/total
 
 
 class Trainer:

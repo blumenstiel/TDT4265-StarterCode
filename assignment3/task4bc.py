@@ -45,5 +45,45 @@ def torch_image_to_numpy(image: torch.Tensor):
     image = np.moveaxis(image, 0, 2)
     return image
 
+# Task 4b)
 
 indices = [14, 26, 32, 49, 52]
+
+# plot filter weights of first layer (selected indices)
+weights = first_conv_layer.weight
+
+plt.figure(figsize=(16, 4))
+for i, idx in enumerate(indices):
+    plt.subplot(1, 5, i+1)
+    img = torch_image_to_numpy(weights[i])
+    plt.imshow(img)
+
+plt.savefig("task4b_zebra_first_weights.png")
+
+# plot activation of first layer (selected indices)
+plt.figure(figsize=(16, 4))
+for i, idx in enumerate(indices):
+    plt.subplot(1, 5, i+1)
+    img = torch_image_to_numpy(activation[0, i])
+    plt.imshow(img, cmap='gray')
+
+plt.savefig("task4b_zebra_first_activation.png")
+
+
+# Task 4c)
+# forward past through all model layer except last two layers to get activation of last conv layer
+x = image
+for i, layer in enumerate(model.children()):
+    x = layer(x)
+    # skip last two layers
+    if i >= 7:
+        break
+
+# plot activation of last conv layer (first 10 indices)
+plt.figure(figsize=(16, 8))
+for i in range(10):
+    plt.subplot(2, 5, i+1)
+    img = torch_image_to_numpy(x[0, i])
+    plt.imshow(img, cmap='gray')
+
+plt.savefig("task4c_zebra_last_conv_activation.png")

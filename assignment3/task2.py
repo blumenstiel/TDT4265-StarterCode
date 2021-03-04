@@ -18,7 +18,6 @@ class ExampleModel(nn.Module):
                 num_classes: Number of classes we want to predict (10)
         """
         super().__init__()
-        # TODO: Implement this function (Task  2a)
         num_filters = 32  # Set number of filters in first conv layer
         self.num_classes = num_classes
         # Define the convolutional layers
@@ -70,7 +69,6 @@ class ExampleModel(nn.Module):
         Args:
             x: Input image, shape: [batch_size, 3, 32, 32]
         """
-        # TODO: Implement this function (Task  2a)
         batch_size = x.shape[0]
         x = self.feature_extractor(x)
         x = x.view(-1, 4*4*128)

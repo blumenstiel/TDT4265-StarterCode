@@ -183,8 +183,23 @@ class Trainer:
                     self.save_model()
                     if self.should_early_stop():
                         print("Early stopping.")
-                        return
+                        break
             bar.update(self.epoch+1)
+
+            if self.should_early_stop():
+                break
+        # print out final values
+        train_loss, train_acc = compute_loss_and_accuracy(
+            self.dataloader_train, self.model, self.loss_criterion
+        )
+        val_loss, val_acc = compute_loss_and_accuracy(
+            self.dataloader_val, self.model, self.loss_criterion
+        )
+        test_loss, test_acc = compute_loss_and_accuracy(
+            self.dataloader_test, self.model, self.loss_criterion
+        )
+        print(f"Finished training with: training loss: {round(train_loss, 4)}, training accuracy: {round(train_acc, 4)}, "
+              f"validation accuracy: {round(val_acc, 4)}, test accuracy: {round(test_acc, 4)}")
 
     def save_model(self):
         def is_best_model():

@@ -50,11 +50,13 @@ def load_cifar10(batch_size: int, validation_fraction: float = 0.1
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
+        transforms.RandomHorizontalFlip(p=0.3)
     ])
     transform_test = transforms.Compose([
         transforms.Resize((224, 224)),
         transforms.ToTensor(),
-        transforms.Normalize(mean, std)
+        transforms.Normalize(mean, std),
+        transforms.RandomHorizontalFlip(p=0.3)
     ])
     data_train = datasets.CIFAR10('data/cifar10',
                                   train=True,
@@ -110,7 +112,7 @@ def create_plots(trainer: Trainer, name: str):
     plt.show()
 
 
-if __name__ == "__main__":
+def main():
     # Set the random generator seed (parameters, shuffling etc).
     # You can try to change this and check if you still get the same result!
     utils.set_seed(0)
@@ -130,3 +132,7 @@ if __name__ == "__main__":
     )
     trainer.train()
     create_plots(trainer, "task4a_transfer_learning")
+
+
+if __name__ == "__main__":
+    main()

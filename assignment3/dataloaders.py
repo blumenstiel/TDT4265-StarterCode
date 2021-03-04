@@ -9,17 +9,19 @@ mean = (0.5, 0.5, 0.5)
 std = (.25, .25, .25)
 
 
-def load_cifar10(batch_size: int, validation_fraction: float = 0.1
-                 ) -> typing.List[torch.utils.data.DataLoader]:
+def load_cifar10(batch_size: int, validation_fraction: float = 0.1, data_augmentation: float = 0
+                 ) -> typing.List[torch.utils.data.DataLoader,]:
     # Note that transform train will apply the same transform for
     # validation!
     transform_train = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean, std),
+        transforms.RandomHorizontalFlip(p=data_augmentation)
     ])
     transform_test = transforms.Compose([
         transforms.ToTensor(),
-        transforms.Normalize(mean, std)
+        transforms.Normalize(mean, std),
+        transforms.RandomHorizontalFlip(p=data_augmentation)
     ])
     data_train = datasets.CIFAR10('data/cifar10',
                                   train=True,

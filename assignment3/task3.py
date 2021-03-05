@@ -137,17 +137,76 @@ class DropoutModel(ExampleModel):
             nn.Linear(64, 10)
         )
 
+class FinalModel(ExampleModel):
 
-class MomentumTrainer(Trainer):
-    """
-    Trainer for Task3e with momentum
-    """
-    def __init__(self, *args, **kwargs):
-        super(FinalTrainer, self).__init__(*args, **kwargs)
-        # Define our optimizer. SGD = Stochastich Gradient Descent
-        self.optimizer = torch.optim.SGD(self.model.parameters(),
-                                        self.learning_rate,
-                                         momentum=0.7)
+    def __init__(self,
+                 image_channels,
+                 num_classes):
+        """
+        Model for task 3e
+        """
+        super().__init__(image_channels, num_classes)
+        num_filters = 64  # Set number of filters in first conv layer
+        self.num_classes = num_classes
+        # Define the convolutional layers
+        self.feature_extractor = nn.Sequential(
+            nn.Conv2d(
+                in_channels=image_channels,
+                out_channels=num_filters,
+                kernel_size=5,
+                stride=1,
+                padding=2
+            ),
+            nn.ReLU(),
+            nn.BatchNorm2d(64),
+            nn.Conv2d(
+                in_channels=num_filters,
+                out_channels=num_filters,
+                kernel_size=5,
+                stride=1,
+                padding=2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size = 2, stride = 2),
+            nn.BatchNorm2d(64),
+            nn.Dropout(0.2),
+            nn.Conv2d(
+              in_channels = num_filters,
+              out_channels = 128,
+              kernel_size = 5,
+              stride = 1,
+              padding = 2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size = 2, stride = 2),
+            nn.BatchNorm2d(128),
+            nn.Dropout(0.2),
+            nn.Conv2d(
+              in_channels = 128,
+              out_channels = 128,
+              kernel_size = 5,
+              stride = 1,
+              padding = 2
+            ),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size = 2, stride = 2),
+            nn.BatchNorm2d(128),
+            nn.Dropout(0.2),
+        )
+        # The output of feature_extractor will be [batch_size, num_filters, 16, 16]
+        self.num_output_features = 4*4*128
+        # Initialize our last fully connected layer
+        # Inputs all extracted features from the convolutional layers
+        # Outputs num_classes predictions, 1 for each class.
+        # There is no need for softmax activation function, as this is
+        # included with nn.CrossEntropyLoss
+        self.classifier = nn.Sequential(
+            nn.Linear(self.num_output_features, 64),
+            nn.ReLU(),
+            nn.BatchNorm1d(64),
+            nn.Linear(64, 10)
+        )
+
 
 
 def create_plots(trainer_list, trainer_labels, name: str):
@@ -166,7 +225,7 @@ def create_plots(trainer_list, trainer_labels, name: str):
     for trainer, label in zip(trainer_list, trainer_labels):
         utils.plot_loss(trainer.validation_history["accuracy"], label=f"Validation Accuracy {label}")
     plt.legend()
-    plt.savefig(f"{name}.png")
+    plt.savefig(f"/content/drive/MyDrive/assignment3/{name}.png")
     plt.show()
 
 
@@ -225,14 +284,13 @@ def main():
     create_plots([trainer_with_data_augmentation], [""], "task3b_best_model")
     create_plots([base_trainer, trainer_with_dropout], ["Task 2", "with Data Augmentation"], "task3d_compare_best_model")
 
-    # reset dropout_model
-    dropout_model = DropoutModel(image_channels=3, num_classes=10)
-    trainer_with_momentum = MomentumTrainer(
+    final_model = FinalModel(image_channels=3, num_classes=10)
+    trainer_with_momentum = Trainer(
         batch_size,
         learning_rate,
         early_stop_count,
         epochs,
-        dropout_model,
+        final_model,
         dataloaders_data_augmentation
     )
     print("Start training model with momentum")

@@ -198,8 +198,8 @@ class Trainer:
         test_loss, test_acc = compute_loss_and_accuracy(
             self.dataloader_test, self.model, self.loss_criterion
         )
-        print(f"Finished training with: training loss: {round(train_loss, 4)}, training accuracy: {round(train_acc, 4)}, "
-              f"validation accuracy: {round(val_acc, 4)}, test accuracy: {round(test_acc, 4)}")
+        print(f"Finished training with: training loss: {(train_loss, 4)}, training accuracy: {(train_acc, 4)}, "
+              f"validation accuracy: {(val_acc, 4)}, test accuracy: {(test_acc, 4)}")
 
     def save_model(self):
         def is_best_model():

@@ -1,4 +1,5 @@
 import torch
+from torch import nn
 
 
 class BasicModel(torch.nn.Module):
@@ -20,6 +21,138 @@ class BasicModel(torch.nn.Module):
         image_channels = cfg.MODEL.BACKBONE.INPUT_CHANNELS
         self.output_feature_shape = cfg.MODEL.PRIORS.FEATURE_MAPS
 
+        # define the CNN
+        self.feature_extractor_0 = nn.Sequential(
+            nn.Conv2d(
+                in_channels=image_channels,
+                out_channels=32,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.MaxPool2d(kernel_size = 2, stride = 2),
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=32,
+                out_channels=64,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.MaxPool2d(kernel_size = 2, stride = 2),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 64,
+              out_channels = 64,
+              kernel_size = 3,
+              stride = 1,
+              padding = 1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 64,
+              out_channels = output_channels[0],
+              kernel_size = 3,
+              stride = 2,
+              padding = 1
+            )
+        )
+
+        self.feature_extractor_1 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=output_channels[0],
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 128,
+              out_channels = output_channels[1] ,
+              kernel_size = 3,
+              stride = 2,
+              padding = 1
+            )
+        )
+
+        self.feature_extractor_2 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=output_channels[1],
+                out_channels=256,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 256,
+              out_channels = output_channels[2] ,
+              kernel_size = 3,
+              stride = 2,
+              padding = 1
+            )
+        )
+
+        self.feature_extractor_3 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=output_channels[2],
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 128,
+              out_channels = output_channels[3] ,
+              kernel_size = 3,
+              stride = 2,
+              padding = 1
+            )
+        )
+
+        self.feature_extractor_4 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=output_channels[3],
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 128,
+              out_channels = output_channels[4] ,
+              kernel_size = 3,
+              stride = 2,
+              padding = 1
+            )
+        )
+
+        self.feature_extractor_5 = nn.Sequential(
+            nn.ReLU(),
+            nn.Conv2d(
+                in_channels=output_channels[4],
+                out_channels=128,
+                kernel_size=3,
+                stride=1,
+                padding=1
+            ),
+            nn.ReLU(),
+            nn.Conv2d(
+              in_channels = 128,
+              out_channels = output_channels[5] ,
+              kernel_size = 3,
+              stride = 1,
+              padding = 0
+            )
+        )
+
     def forward(self, x):
         """
         The forward functiom should output features with shape:
@@ -34,9 +167,21 @@ class BasicModel(torch.nn.Module):
             shape(-1, output_channels[0], 38, 38),
         """
         out_features = []
+        x = self.feature_extractor_0(x)
+        out_features.append(x)
+        x = self.feature_extractor_1(x)
+        out_features.append(x)
+        x = self.feature_extractor_2(x)
+        out_features.append(x)
+        x = self.feature_extractor_3(x)
+        out_features.append(x)
+        x = self.feature_extractor_4(x)
+        out_features.append(x)
+        x = self.feature_extractor_5(x)
+        out_features.append(x)
         for idx, feature in enumerate(out_features):
             w, h = self.output_feature_shape[idx]
-            expected_shape = (out_channel, h, w)
+            expected_shape = (self.output_channels[idx], h, w)
             assert feature.shape[1:] == expected_shape, \
                 f"Expected shape: {expected_shape}, got: {feature.shape[1:]} at output IDX: {idx}"
         return tuple(out_features)

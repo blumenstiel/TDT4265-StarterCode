@@ -1,6 +1,6 @@
 from torch import nn
 from ssd.modeling.backbone.vgg import VGG
-from ssd.modeling.backbone.basic import BasicModel
+from ssd.modeling.backbone.basic import BasicModel, ImprovedModel
 from ssd.modeling.box_head.box_head import SSDBoxHead
 from ssd.utils.model_zoo import load_state_dict_from_url
 from ssd import torch_utils

@@ -33,6 +33,9 @@ def build_backbone(cfg):
     if backbone_name == "basic":
         model = BasicModel(cfg)
         return model
+    if backbone_name == "improved":
+        model = ImprovedModel(cfg)
+        return model
     if backbone_name == "vgg":
         model = VGG(cfg)
         if cfg.MODEL.BACKBONE.PRETRAINED:
